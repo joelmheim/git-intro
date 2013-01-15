@@ -37,6 +37,200 @@
           <h2>Agenda</h2>
         </section>
 
+        <section>
+          <h2>PhoneGap</h2>
+          <p><a href="http://phonegap.com/">phonegap.com</a></p>
+          <ul>
+            <li>Open source mobile development framework.</li>
+            <li>Enables developers to write native apps with HTML, CSS, and JavaScript.</li>
+            <li>Gives access to the native funtionalities of mobile devices.</li>
+            <li>PhoneGap apps will run in the background in your mobile web browser.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Supported Features</h2>
+          <img src="images/phonegap-supported-features.png" alt="Meny">
+        </section>
+
+        <section>
+          <h2>Why use PhoneGap</h2>
+          <ul>
+            <li>Crossplatform. Write once, runs lots of places.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>How does PhoneGap work</h2>
+          <img src="images/phonegap_flow.png" alt="Meny">
+          <ol>
+            <li>Create your apps using HTML, CSS, and JavaScript.</li>
+            <li>Use PhoneGap JavaScript API to access native functionality.</li>
+            <li>Compile and package your apps for distribution (.apk for Android).</li>
+            <li>Install and run your apps on your mobile device.</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2>PhoneGap Build</h2>
+          <p><a href="https://build.phonegap.com/">build.phonegap.com</a></p>
+          <img width="20%" height="20%" src="images/buildbot-hero.png" alt="Meny">
+          <ul>
+            <li>A cloud service that can build your PhoneGap apps.</li>
+            <li>Supports multiple platforms.</li>
+            <li>Apps will always be built with the most up-to-date SDK for the platform you are targeting.</li>
+          </ul>
+          <aside class="notes">
+            1) Maintaining native SDKs yourself can be a headache/pain.
+            2) Since PhoneGap Build uses Apple's standard development process to build applications, you will need to sign up for their developer program to build iOS applications on PhoneGap Build.
+          </aside>
+        </section>
+
+        <section>
+          <h2>How it works</h2>
+          <img style="background-color:black;" src="images/Build-Diagram.png" alt="Meny">
+          <ul>
+            <li>Simply upload your PhoneGap code (HTML, CSS, and JavaScript) to the PhoneGap Build service. After it has finished building, it will return you something you can install and run on your device.</li>
+            <li>You can configure the apps (title, icons, splash screens, and other properties) with a configuration XML file, config.xml.</li>
+          </ul> 
+          <aside class="notes">
+            <h2>Supported Platforms</h2>
+            <ul>
+              <li>Android</li>
+              <li>iOS</li>
+              <li>webOS</li>
+              <li>Windows Mobile/Phone</li>
+              <li>Symbian</li>
+              <li>BlackBerry</li>
+            </ul>
+          </aside>
+        </section>
+
+        <section>
+          <h2>How to build</h2>
+          <ul>
+            <img style="background-color:black;" src="images/phone-gap-build-web.png" alt="Meny">
+            <li>Control the building process through a web interface or REST API.</li>
+            <li>Either: 
+              <ul>
+                <li>Upload sources files (a ZIP file of HTML, CSS and JavaScript, or a single index.html file).</li>
+                <li>Use a GitHub repository.</li>
+              </ul>
+            </li>
+          </ul> 
+        </section>
+
+        <section>
+          <h2>How we build</h2>
+          <p>
+            We have written a simple build script that uses the <a href="https://build.phonegap.com/docs/api">REST API</a> of PhoneGap Build.
+          </p>
+          <aside class="notes">
+            Explain why we used REST API instead of GitHub. PhoneGap Build does not work with GitHub organization accounts.
+          </aside>
+        </section>
+
+        <section>
+          <h2>The REST API</h2>
+          <ul>
+            <li>Allows you to:
+              <ul><li>Create, build, update, and download apps.</li>
+                <li>Get build information status.</li> 
+                <li>Create, and delete projects.</li>
+              </ul>
+            </li>
+            <li>Supports two forms of authentication: 
+              <ul>
+                <li>Basic authentication (username and password).</li>
+                <li>Token authentication.</li>
+              </ul>
+            </li>
+          </ul>
+          <aside class="notes">
+            
+          </aside>
+        </section>  
+
+        <section data-state="customevent">
+          <h2>REST API Example</h2>
+          <p>Get a JSON-encoded representation of a particular app.</p>
+          <p>GET https://build.phonegap.com/api/v1/apps/:id</p>
+          <pre><code>
+curl -u andrew.lunny@nitobi.com https://build.phonegap.com/api/v1/apps/2
+          </code></pre>
+          <p>Result (JSON):</p>
+          <pre><code>
+{
+    "title":"PhoneGap: Getting Started",
+    "id":2,
+    "package":"com.phonegap.getting.started",
+    "version":"1.0.0",
+    "repo":"https://github.com/phonegap/phonegap-start.git",
+    "description":"A template for getting started with
+            PhoneGap development and build.phonegap.com",
+    "debug":false,
+    "private":true,
+    "link":"/api/v1/apps/2",
+    "build_count":12,
+    "status": {
+        "android":"complete",
+        "blackberry":"complete",
+        "ios":"complete",
+        "symbian":"complete",
+        "webos":"complete",
+        "winphone":"complete"
+    },
+    "download":{
+        "android":"/api/v1/apps/1/android",
+        "blackberry":"/api/v1/apps/1/blackberry",
+        "ios":"/api/v1/apps/1/ios",
+        "symbian":"/api/v1/apps/1/symbian",
+        "webos":"/api/v1/apps/1/webos",
+        "winphone":"/api/v1/apps/1/winphone"
+    },
+    "error":{},
+    "icon":{
+        "filename":"big-icon.png",
+        "link":"/api/v1/apps/2/icon"
+    },
+    "role":"admin",
+    "keys":{},
+    "collaborators":{
+        "link":"/api/v1/apps/9/collaborators",
+        "active":[
+            {
+                "id":9,
+                "person":"andrew.lunny@nitobi.com",
+                "role":"admin",
+                "link":"/api/v1/apps/9/collaborators/9"
+            },
+            {
+                "id":13,
+                "person":"foo@bar.com",
+                "role":"developer",
+                "link":"/api/v1/apps/9/collaborators/13"
+            }
+        ],
+        "pending":[
+            {
+                "person":"nobody@nitobi.com",
+                "role":"tester"
+            }
+        ]
+    }
+}
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>The build script</h2>
+          <ol>
+            <li>Request a build by uploading the SpaceHunter source code to PhoneGap Build service (as a .zip file)</li>
+            <li>Wait for build to be finished.</li>
+            <li>Download installable apps for various mobile platforms.</li>
+          </ol>
+        </section>
+
       </div>
     </div>
 
