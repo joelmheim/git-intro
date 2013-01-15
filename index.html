@@ -37,6 +37,102 @@
           <h2>Agenda</h2>
         </section>
 
+<!-- Geolocation section --> 
+        <section>
+          <h1>HTML5 Geolocation</h1>
+          <p>Uses HTML5 Geolocation to determine:</p>
+          <ul>
+            <li>Nearest locations list. Not suitable for single rooms, as indoor position accuracy are bad</li>
+            <li>Map of locations (centered on user position)</li>
+            <li>As starting point for search</li>
+          </ul>
+
+          <p>Works well on cellphones, not so good on laptops..</p>
+
+          <code>
+navigator.geolocation.getCurrentPosition(function (pos) {
+    var lat = pos.coords.latitude;
+    var lon = pos.coords.longitude;
+
+    var searchDistance = 10; //km
+    spacehunter.repo.getLocationsNearPosition(lon, lat, searchDistance * 1000, function (locations) {
+        //handle response here (ie display locations in list)
+    });
+
+}, function (error) {
+   alert("Unable to determine location. Error: " + error.code);
+}, {timeout: 50000});
+          </code>
+        </section>
+
+        <section>
+          <h1>Distance calculation</h1>
+          <p>All locations have a position (lon, lat), ex:<br>
+
+          <code>
+{ "key": "TR-RO", "country": "Norway", "area": "Trondheim", "location": "Rotvoll", "position": { "lat": 63.438878, "lon": 10.478261}}
+          </code>
+          </p>
+
+          <h2>To get distance</h2>
+          <code>
+function getLocationsSortedByDistance(lon, lat) {
+    var userPos = new Point(lon, lat);
+    var distances = allLocations.map(function (location) {
+        var pos = new Point(location.position.lon, location.position.lat);
+        var dist = userPos.distanceTo(pos);
+        return {location: location.location, distance: dist};
+    });
+    return distances.sort(function (a, b) {return a.distance - b.distance; });
+}
+          </code>
+
+          <h2>Point implementation:</h2>
+          <code>
+var Point = function(x,y){
+    this.x = x;
+    this.y = y;
+};
+
+Point.prototype.distanceTo = function(point){
+    var a = {lon: this.x, lat: this.y};
+    var b = {lon: point.x, lat: point.y};
+    return distVincenty(a, b) * 1000;
+};
+
+var distVincenty = function(p1, p2) {
+    //Implementation Vincenty's formulae (http://en.wikipedia.org/wiki/Vincenty%27s_formulae) 
+    //for calculating distance in meters between two lon/lat points
+    //code borrowed from OpenLayers.org 
+}
+          </code>
+        </section>
+
+        <section>
+          <h1>Map interface</h1>
+          <ul>
+            <li>Use Leaflet (leafletjs.com) to display a map with locations</li>
+            <li>Uses OpenStreetMap.org background Map</li>
+            <li>Locations are clickable, takes you to room listing for location</li>
+            <li>Map initially centered on user location</li>
+          </ul>
+
+          <h2>Setting up a map in leaflet</h2>
+          <code>
+var map = new L.Map('mapcanvas'); //create map in div with id="mapcanvas"
+var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+var osm = new L.TileLayer(osmUrl, {minZoom: 2, maxZoom: 14, attribution: 'Map data © OpenStreetMap contributors'}); //create OpenStretMap layer
+map.addLayer(osm); //add openStreetMap layer to map
+_.each(locations, function (location) {
+    var marker = L.marker([location.position.lat, location.position.lon]).addTo(map); //add markers
+});
+map.setView(new L.LatLng(lat, lon), 9); //initialize map
+          </code>
+        </section>
+
+<!-- End geolocation -->
+
+<!-- Phonegap sections -->
         <section>
           <h2>PhoneGap</h2>
           <p><a href="http://phonegap.com/">phonegap.com</a></p>
@@ -130,6 +226,9 @@
           </aside>
         </section>
 
+<!-- End PhoneGap --> 
+
+<!-- REST API --> 
         <section>
           <h2>The REST API</h2>
           <ul>
@@ -230,6 +329,7 @@ curl -u andrew.lunny@nitobi.com https://build.phonegap.com/api/v1/apps/2
             <li>Download installable apps for various mobile platforms.</li>
           </ol>
         </section>
+<!-- End Rest Api --> 
 
       </div>
     </div>
