@@ -2,13 +2,13 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>reveal.js - The HTML Presentation Framework</title>
+    <title>Spacehunter Mobile</title>
     <meta name="description" content="A framework for easily creating beautiful presentations using HTML">
     <meta name="author" content="Hakim El Hattab">
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="stylesheet" href="css/reveal.min.css">
-    <link rel="stylesheet" href="css/theme/default.css" id="theme">
+    <link rel="stylesheet" href="css/theme/statoil.css" id="theme">
 
     <!-- For syntax highlighting -->
     <link rel="stylesheet" href="lib/css/zenburn.css">
@@ -28,54 +28,109 @@
       <div class="slides">
 
         <section>
-          <h1>spacehunter mobile</h1>
-          <p>
-          <br>
-          </p>
+        <img class="logo" src="images/statoil_logo_dark_vertical.jpg"/>
+          <h1>SpaceHunter Mobile</h1>
+          <img src="images/spacehunter.logo.full.png" height=250px/>
         </section>
         <section>
           <h2>Agenda</h2>
+          <ul>
+            <li>Roadmap</li>
+            <li>Demo of the initial product</li>
+            <li>Experiences
+              <ul>
+                <li>Restful backend</li>
+                <li>The server story</li>
+                <li>Geolocation story</li>
+                <li>jQuery client</li>
+                <li>PhoneGap</li>
+                <li>Android native</li>
+                <li>HTML5 vs native</li>
+              </ul>
+            </li>
+          </ul>
         </section>
+<!-- Roadmap -->
+        <section>
+          <h1>Roadmap</h1>
+          <img src="images/roadmap.png"/>
+        </section>
+
+        <section>
+          <h1>Demo</h1>
+          <a href="http://spacehunterserver.herokuapp.com/">Heroku</a>
+        </section>
+<!-- End roadmap -->
+
+<!-- REST backend -->
+        <section> 
+          <section>
+            <h1>Restful backend</h1>
+          </section>
+        </section>
+<!-- End Rest backend --> 
+
+<!-- Server story -->
+        <section>
+          <section>
+            <h1>The server story</h1>
+            <p>Statoil infrastructure fail</p>
+          </section>
+          <section>
+            <h2>2011: Azure</h2>
+          </section>  
+        </section>
+<!-- End server story --> 
 
 <!-- Geolocation section --> 
         <section>
-          <h1>HTML5 Geolocation</h1>
-          <p>Uses HTML5 Geolocation to determine:</p>
-          <ul>
-            <li>Nearest locations list. Not suitable for single rooms, as indoor position accuracy are bad</li>
-            <li>Map of locations (centered on user position)</li>
-            <li>As starting point for search</li>
-          </ul>
+          <section>
+            <h1>HTML5 Geolocation</h1>
+            <p>Uses HTML5 Geolocation to determine:</p>
+            <ul>
+              <li>Nearest locations list</li>
+              <li>Map of locations (centered on userposition)</li>
+              <li>Suggested location for search</li>
+            </ul>
 
-          <p>Works well on cellphones, not so good on laptops..</p>
-
-          <code>
+          </section>
+          <section>
+            <h2>Example:</h2>
+            <pre><code>
 navigator.geolocation.getCurrentPosition(function (pos) {
-    var lat = pos.coords.latitude;
-    var lon = pos.coords.longitude;
-
-    var searchDistance = 10; //km
-    spacehunter.repo.getLocationsNearPosition(lon, lat, searchDistance * 1000, function (locations) {
-        //handle response here (ie display locations in list)
-    });
+  var lat = pos.coords.latitude;
+  var lon = pos.coords.longitude;
+  var searchDistance = 10; //km
+  spacehunter.repo.getLocationsNearPosition(lon, 
+                                            lat, 
+                                            searchDistance * 1000, 
+                                            function (locations) {
+      //handle response here (ie display locations in list)
+  });
 
 }, function (error) {
-   alert("Unable to determine location. Error: " + error.code);
+  alert("Unable to determine location. Error: " + error.code);
 }, {timeout: 50000});
-          </code>
-        </section>
+            </code></pre>
+          </section>
 
-        <section>
-          <h1>Distance calculation</h1>
-          <p>All locations have a position (lon, lat), ex:<br>
+          <section>
+            <h2>Distance calculation</h2>
+            <p>All locations have a position (lon, lat), ex:<br>
 
-          <code>
-{ "key": "TR-RO", "country": "Norway", "area": "Trondheim", "location": "Rotvoll", "position": { "lat": 63.438878, "lon": 10.478261}}
-          </code>
-          </p>
-
-          <h2>To get distance</h2>
-          <code>
+            <pre><code>
+{ "key": "TR-RO", 
+  "country": "Norway", 
+  "area": "Trondheim", 
+  "location": "Rotvoll", 
+  "position": { "lat": 63.438878, "lon": 10.478261}
+}
+            </code></pre>
+            </p>
+          </section>
+          <section>
+            <h2>To get distance</h2>
+            <pre><code>
 function getLocationsSortedByDistance(lon, lat) {
     var userPos = new Point(lon, lat);
     var distances = allLocations.map(function (location) {
@@ -83,12 +138,16 @@ function getLocationsSortedByDistance(lon, lat) {
         var dist = userPos.distanceTo(pos);
         return {location: location.location, distance: dist};
     });
-    return distances.sort(function (a, b) {return a.distance - b.distance; });
+    return distances.sort(function (a, b) {
+      return a.distance - b.distance; 
+    });
 }
-          </code>
-
-          <h2>Point implementation:</h2>
-          <code>
+            </code></pre>
+          </section>
+          
+          <section>
+            <h2>Point implementation:</h2>
+            <pre><code>
 var Point = function(x,y){
     this.x = x;
     this.y = y;
@@ -101,164 +160,181 @@ Point.prototype.distanceTo = function(point){
 };
 
 var distVincenty = function(p1, p2) {
-    //Implementation Vincenty's formulae (http://en.wikipedia.org/wiki/Vincenty%27s_formulae) 
-    //for calculating distance in meters between two lon/lat points
-    //code borrowed from OpenLayers.org 
+    //Formula: http://en.wikipedia.org/wiki/Vincenty%27s_formulae
+    //Code borrowed from OpenLayers.org 
 }
-          </code>
-        </section>
+            </code></pre>
+          </section>
 
-        <section>
-          <h1>Map interface</h1>
-          <ul>
-            <li>Use Leaflet (leafletjs.com) to display a map with locations</li>
-            <li>Uses OpenStreetMap.org background Map</li>
-            <li>Locations are clickable, takes you to room listing for location</li>
-            <li>Map initially centered on user location</li>
-          </ul>
+          <section>
+            <h2>Map interface</h2>
+            <ul>
+              <li>Use Leaflet (leafletjs.com) to display a map with locations</li>
+              <li>Uses OpenStreetMap.org background Map</li>
+              <li>Locations are clickable, takes you to room listing for location</li>
+              <li>Map initially centered on user location</li>
+            </ul>
+          </section>
 
-          <h2>Setting up a map in leaflet</h2>
-          <code>
-var map = new L.Map('mapcanvas'); //create map in div with id="mapcanvas"
+          <section>
+            <h2>Setting up a map in leaflet</h2>
+            <pre><code>
+//create map in div with id="mapcanvas"
+var map = new L.Map('mapcanvas'); 
 var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-var osm = new L.TileLayer(osmUrl, {minZoom: 2, maxZoom: 14, attribution: 'Map data © OpenStreetMap contributors'}); //create OpenStretMap layer
-map.addLayer(osm); //add openStreetMap layer to map
+//create OpenStretMap layer
+var osm = new L.TileLayer(osmUrl, 
+    { minZoom: 2, maxZoom: 14, 
+      attribution: 'Map data © OpenStreetMap contributors'}); 
+//add openStreetMap layer to map
+map.addLayer(osm);
+//add markers
 _.each(locations, function (location) {
-    var marker = L.marker([location.position.lat, location.position.lon]).addTo(map); //add markers
+    var marker = L.marker([location.position.lat, 
+                           location.position.lon]).addTo(map);
 });
-map.setView(new L.LatLng(lat, lon), 9); //initialize map
-          </code>
+//initialize map
+map.setView(new L.LatLng(lat, lon), 9); 
+            </code></pre>
+          </section>
         </section>
-
 <!-- End geolocation -->
 
 <!-- Phonegap sections -->
         <section>
-          <h2>PhoneGap</h2>
-          <p><a href="http://phonegap.com/">phonegap.com</a></p>
-          <ul>
-            <li>Open source mobile development framework.</li>
-            <li>Enables developers to write native apps with HTML, CSS, and JavaScript.</li>
-            <li>Gives access to the native funtionalities of mobile devices.</li>
-            <li>PhoneGap apps will run in the background in your mobile web browser.</li>
-          </ul>
-        </section>
-
-        <section>
-          <h2>Supported Features</h2>
-          <img src="images/phonegap-supported-features.png" alt="Meny">
-        </section>
-
-        <section>
-          <h2>Why use PhoneGap</h2>
-          <ul>
-            <li>Crossplatform. Write once, runs lots of places.</li>
-          </ul>
-        </section>
-
-        <section>
-          <h2>How does PhoneGap work</h2>
-          <img src="images/phonegap_flow.png" alt="Meny">
-          <ol>
-            <li>Create your apps using HTML, CSS, and JavaScript.</li>
-            <li>Use PhoneGap JavaScript API to access native functionality.</li>
-            <li>Compile and package your apps for distribution (.apk for Android).</li>
-            <li>Install and run your apps on your mobile device.</li>
-          </ol>
-        </section>
-
-        <section>
-          <h2>PhoneGap Build</h2>
-          <p><a href="https://build.phonegap.com/">build.phonegap.com</a></p>
-          <img width="20%" height="20%" src="images/buildbot-hero.png" alt="Meny">
-          <ul>
-            <li>A cloud service that can build your PhoneGap apps.</li>
-            <li>Supports multiple platforms.</li>
-            <li>Apps will always be built with the most up-to-date SDK for the platform you are targeting.</li>
-          </ul>
-          <aside class="notes">
-            1) Maintaining native SDKs yourself can be a headache/pain.
-            2) Since PhoneGap Build uses Apple's standard development process to build applications, you will need to sign up for their developer program to build iOS applications on PhoneGap Build.
-          </aside>
-        </section>
-
-        <section>
-          <h2>How it works</h2>
-          <img style="background-color:black;" src="images/Build-Diagram.png" alt="Meny">
-          <ul>
-            <li>Simply upload your PhoneGap code (HTML, CSS, and JavaScript) to the PhoneGap Build service. After it has finished building, it will return you something you can install and run on your device.</li>
-            <li>You can configure the apps (title, icons, splash screens, and other properties) with a configuration XML file, config.xml.</li>
-          </ul> 
-          <aside class="notes">
-            <h2>Supported Platforms</h2>
+          <section>
+            <h1>PhoneGap</h1>
+            <p><a href="http://phonegap.com/">phonegap.com</a></p>
             <ul>
-              <li>Android</li>
-              <li>iOS</li>
-              <li>webOS</li>
-              <li>Windows Mobile/Phone</li>
-              <li>Symbian</li>
-              <li>BlackBerry</li>
+              <li>Open source mobile development framework.</li>
+              <li>Enables developers to write native apps with HTML, CSS, and JavaScript.</li>
+              <li>Gives access to the native funtionalities of mobile devices.</li>
+              <li>PhoneGap apps will run in the background in your mobile web browser.</li>
             </ul>
-          </aside>
-        </section>
+          </section>
 
-        <section>
-          <h2>How to build</h2>
-          <ul>
-            <img style="background-color:black;" src="images/phone-gap-build-web.png" alt="Meny">
-            <li>Control the building process through a web interface or REST API.</li>
-            <li>Either: 
+          <section>
+            <h2>Supported Features</h2>
+            <img src="images/phonegap-supported-features.png" alt="Meny">
+          </section>
+
+          <section>
+            <h2>Why use PhoneGap</h2>
+            <ul>
+              <li>Crossplatform. Write once, runs lots of places.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>How does PhoneGap work</h2>
+            <img src="images/phonegap_flow.png" alt="Meny">
+            <ol>
+              <li>Create your apps using HTML, CSS, and JavaScript.</li>
+              <li>Use PhoneGap JavaScript API to access native functionality.</li>
+              <li>Compile and package your apps for distribution (.apk for Android).</li>
+              <li>Install and run your apps on your mobile device.</li>
+            </ol>
+          </section>
+
+          <section>
+            <h2>PhoneGap Build</h2>
+            <p><a href="https://build.phonegap.com/">build.phonegap.com</a></p>
+            <img width="20%" height="20%" src="images/buildbot-hero.png" alt="Meny">
+            <ul>
+              <li>A cloud service that can build your PhoneGap apps.</li>
+              <li>Supports multiple platforms.</li>
+              <li>Apps will always be built with the most up-to-date SDK for the platform you are targeting.</li>
+            </ul>
+            <aside class="notes">
+              1) Maintaining native SDKs yourself can be a headache/pain.
+              2) Since PhoneGap Build uses Apple's standard development process to build applications, you will need to sign up for their developer program to build iOS applications on PhoneGap Build.
+            </aside>
+          </section>
+
+          <section>
+            <h2>How it works</h2>
+            <img style="background-color:black;" src="images/Build-Diagram.png" alt="Meny">
+            <ul>
+              <li>Simply upload your PhoneGap code (HTML, CSS, and JavaScript) to the PhoneGap Build service. After it has finished building, it will return you something you can install and run on your device.</li>
+              <li>You can configure the apps (title, icons, splash screens, and other properties) with a configuration XML file, config.xml.</li>
+            </ul> 
+            <aside class="notes">
+              <h2>Supported Platforms</h2>
               <ul>
-                <li>Upload sources files (a ZIP file of HTML, CSS and JavaScript, or a single index.html file).</li>
-                <li>Use a GitHub repository.</li>
+                <li>Android</li>
+                <li>iOS</li>
+                <li>webOS</li>
+                <li>Windows Mobile/Phone</li>
+                <li>Symbian</li>
+                <li>BlackBerry</li>
               </ul>
-            </li>
-          </ul> 
-        </section>
+            </aside>
+          </section>
 
-        <section>
-          <h2>How we build</h2>
-          <p>
-            We have written a simple build script that uses the <a href="https://build.phonegap.com/docs/api">REST API</a> of PhoneGap Build.
-          </p>
-          <aside class="notes">
-            Explain why we used REST API instead of GitHub. PhoneGap Build does not work with GitHub organization accounts.
-          </aside>
-        </section>
+          <section>
+            <h2>How to build</h2>
+            <ul>
+              <img style="background-color:black;" src="images/phone-gap-build-web.png" alt="Meny">
+              <li>Control the building process through a web interface or REST API.</li>
+              <li>Either: 
+                <ul>
+                  <li>Upload sources files (a ZIP file of HTML, CSS and JavaScript, or a single index.html file).</li>
+                  <li>Use a GitHub repository.</li>
+                </ul>
+              </li>
+            </ul> 
+          </section>
 
-<!-- End PhoneGap --> 
+          <section>
+            <h2>How we build</h2>
+            <p>
+              We have written a simple build script that uses the <a href="https://build.phonegap.com/docs/api">REST API</a> of PhoneGap Build.
+            </p>
+            <aside class="notes">
+              Explain why we used REST API instead of GitHub. PhoneGap Build does not work with GitHub organization accounts.
+            </aside>
+          </section>
 
-<!-- REST API --> 
-        <section>
-          <h2>The REST API</h2>
-          <ul>
-            <li>Allows you to:
-              <ul><li>Create, build, update, and download apps.</li>
-                <li>Get build information status.</li> 
-                <li>Create, and delete projects.</li>
-              </ul>
-            </li>
-            <li>Supports two forms of authentication: 
-              <ul>
-                <li>Basic authentication (username and password).</li>
-                <li>Token authentication.</li>
-              </ul>
-            </li>
-          </ul>
-          <aside class="notes">
-            
-          </aside>
-        </section>  
+          <section>
+            <h2>The build script</h2>
+            <ol>
+              <li>Request a build by uploading the SpaceHunter source code to PhoneGap Build service (as a .zip file)</li>
+              <li>Wait for build to be finished.</li>
+              <li>Download installable apps for various mobile platforms.</li>
+            </ol>
+          </section>
 
-        <section data-state="customevent">
-          <h2>REST API Example</h2>
-          <p>Get a JSON-encoded representation of a particular app.</p>
-          <p>GET https://build.phonegap.com/api/v1/apps/:id</p>
-          <pre><code>
+          <section>
+            <h2>The REST API</h2>
+            <ul>
+              <li>Allows you to:
+                <ul>
+                  <li>Create, build, update, and download apps.</li>
+                  <li>Get build information status.</li> 
+                  <li>Create, and delete projects.</li>
+                </ul>
+              </li>
+              <li>Supports two forms of authentication: 
+                <ul>
+                  <li>Basic authentication (username and password).</li>
+                  <li>Token authentication.</li>
+                </ul>
+              </li>
+            </ul>
+            <aside class="notes">
+              
+            </aside>
+          </section>  
+
+          <section data-state="customevent">
+            <h2>REST API Example</h2>
+            <p>Get a JSON-encoded representation of a particular app.</p>
+            <p>GET https://build.phonegap.com/api/v1/apps/:id</p>
+            <pre><code>
 curl -u andrew.lunny@nitobi.com https://build.phonegap.com/api/v1/apps/2
-          </code></pre>
-          <p>Result (JSON):</p>
-          <pre><code>
+            </code></pre>
+            <p>Result (JSON):</p>
+            <pre><code>
 {
     "title":"PhoneGap: Getting Started",
     "id":2,
@@ -318,46 +394,38 @@ curl -u andrew.lunny@nitobi.com https://build.phonegap.com/api/v1/apps/2
         ]
     }
 }
-          </code></pre>
+            </code></pre>
+          </section>
         </section>
-
-        <section>
-          <h2>The build script</h2>
-          <ol>
-            <li>Request a build by uploading the SpaceHunter source code to PhoneGap Build service (as a .zip file)</li>
-            <li>Wait for build to be finished.</li>
-            <li>Download installable apps for various mobile platforms.</li>
-          </ol>
-        </section>
-<!-- End Rest Api --> 
+<!-- End PhoneGap --> 
 
 <!-- Android native start -->
         <section>
-          <h1>Android native client</h1>
-          <p>What?</p>
-          <ul>
-            <li>Written for Android phones</li>
-            <li>Java code using the Android SDK</li>
-            <li>Low-level code compared to JavaScript!</li>
-            <li>Better hardware access</li>
-            <li>Fast!</li>
-          </ul>
-        </section>
-
-        <section>
-          <h1>Android client</h1>
-          <p>Why?</p>
-          <ul>
-            <li>Wanted to experiment with Android development</li>
-            <li>Get awesome speed</li>
-            <li>Flexibility</li>
-            <li>Curiosity</li>
-          </ul>
-        </section>
-
-        <section>
           <section>
-            <h1>The native client</h1>
+            <h2>Android client</h2>
+            <p>Why?</p>
+            <ul>
+              <li>Wanted to experiment with Android development</li>
+              <li>Get awesome speed</li>
+              <li>Flexibility</li>
+              <li>Curiosity</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Android native client</h2>
+            <p>What?</p>
+            <ul>
+              <li>Written for Android phones</li>
+              <li>Java code using the Android SDK</li>
+              <li>Low-level code compared to JavaScript!</li>
+              <li>Better hardware access</li>
+              <li>Fast!</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>The native client</h2>
             <p>We focus on compatibility!</p>
             <br/>
             <ul>
@@ -386,18 +454,6 @@ curl -u andrew.lunny@nitobi.com https://build.phonegap.com/api/v1/apps/2
           </section>
 
           <section>
-            <h2>How does it work?</h2>
-            <p>You install the APK from the internal <i>"AppStore"</i>, and then simply starts the app!</p>
-            <br/>
-
-            <ul>
-              <li>Connects to our backend server</li>
-              <li>JSON communication</li>
-              <li>Simple yet efficient data transfers</li>
-            </ul>
-          </section>
-
-          <section>
             <h2>Native details</h2>
             <p>Some highlights of the native client internals</p>
             <br/>
@@ -408,7 +464,7 @@ curl -u andrew.lunny@nitobi.com https://build.phonegap.com/api/v1/apps/2
                   <li>Efficient and fast!</li>
                 </ul>
               </li>
-              
+                
               <li>SherlockActionBar
                 <ul>
                   <li>To achieve "ActionBar" for older phones</li>
@@ -437,8 +493,6 @@ curl -u andrew.lunny@nitobi.com https://build.phonegap.com/api/v1/apps/2
             </ul>
           </section>
         </section>
-
-
 <!-- End Android native -->
 
       </div>
