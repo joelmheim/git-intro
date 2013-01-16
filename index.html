@@ -331,6 +331,103 @@ curl -u andrew.lunny@nitobi.com https://build.phonegap.com/api/v1/apps/2
         </section>
 <!-- End Rest Api --> 
 
+<!-- Android native start -->
+        <section>
+          <h1>Android native client</h1>
+          <p>What?</p>
+          <ul>
+            <li>Written for Android phones</li>
+            <li>Java code using the Android SDK</li>
+            <li>Low-level code compared to JavaScript!</li>
+            <li>Better hardware access</li>
+            <li>Fast!</li>
+          </ul>
+        </section>
+
+        <section>
+          <h1>Android client</h1>
+          <p>Why?</p>
+          <ul>
+            <li>Wanted to experiment with Android development</li>
+            <li>Get awesome speed</li>
+            <li>Flexibility</li>
+            <li>Curiosity</li>
+          </ul>
+        </section>
+
+        <section>
+          <section>
+            <h1>The native client</h1>
+            <p>We focus on compatibility!</p>
+            <br/>
+            <ul>
+              <li>Support for Android Gingerbread (2.3.X) and upwards</li>
+              <li>Wanted a neat <i>Statoil</i>-ish style
+                <ul>
+                  <li>with appropriate colors and style</li>
+                </ul>
+              </li>
+              <li>Support older HTC Desire phones</li>
+              <li>And keep up with the "newer" Android phones</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>How does it work?</h2>
+            <p>You install the APK from the internal <i>"AppStore"</i>, and then simply starts the app!</p>
+            <br/>
+
+            <ul>
+              <li>Connects to our backend server</li>
+              <li>JSON communication</li>
+              <li>Simple yet efficient data transfers</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Native details</h2>
+            <p>Some highlights of the native client internals</p>
+            <br/>
+
+            <ul>
+              <li>Using SQLite to cache and keep downloaded data persistent
+                <ul>
+                  <li>Efficient and fast!</li>
+                </ul>
+              </li>
+              
+              <li>SherlockActionBar
+                <ul>
+                  <li>To achieve "ActionBar" for older phones</li>
+                  <li>Simple and <i>backwards</i> compatible</li>
+                </ul>
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Native details (2)</h2>
+            <br/>
+
+            <p>Smartphones nowadays have two or more cores.. <br/><b>Use them!</b></p>
+            <br/>
+            <ul>
+              <li>Background threads for
+                <ul>
+                  <li>Download / communicate with backend server</li>
+                  <li>Parse / "post-process" data</li>
+                  <li>Refresh persistent data in SQlite db</li>
+                </ul>
+              </li>
+              <li>Responsive user interface</li>
+              <li>Utilize the cores</li>
+            </ul>
+          </section>
+        </section>
+
+
+<!-- End Android native -->
+
       </div>
     </div>
 
