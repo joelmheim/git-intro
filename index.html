@@ -36,7 +36,7 @@
           <h2>Agenda</h2>
           <ul>
             <li>Roadmap</li>
-            <li>Demo of the initial product</li>
+            <li>Demo</li>
             <li>Experiences
               <ul>
                 <li>Restful backend</li>
@@ -52,10 +52,18 @@
         </section>
 <!-- Roadmap -->
         <section>
-          <h1>Roadmap</h1>
-          <img src="images/roadmap.png"/>
+          <section>
+            <h1>Roadmap</h1>
+            <img src="images/roadmap.png"/>
+          </section>
+          <section>
+            <h2>Planned versions</h2>
+            <p class="fragment">jQuery mobile v1 for Android and iOS - browse rooms and search for available rooms</p>
+            <p class="fragment">jQuery mobile v2 for Android and iOS - adding booking functionality</p>
+            <p class="fragment">Androic native v1 - improved performance and look and feel</p>
+            <p class="fragment">Responsive web client - take better advantage of screen realestate for tablets and PCs</a>
+          </section>
         </section>
-
         <section>
           <h1>Demo</h1>
           <a href="http://spacehunterserver.herokuapp.com/">Heroku</a>
@@ -66,9 +74,163 @@
         <section> 
           <section>
             <h1>Restful backend</h1>
+            <p>Providing the application with data</p>
+          </section>
+          <section>
+            <p>API</p>
+            <pre><code class="html">
+/locations
+/locations/TR-RO
+/rooms
+/rooms/rtrro72075
+/rooms/rtrro72075/availability
+            </code></pre>
+          </section>   
+          <section>
+            <p>The data is easily retrieved using Microsoft Exchange's open source REST API.</p>
+            <img class="fragment roll-in" src="images/troll.png" />
+          </section>
+          <section>
+            <h2>No, really...</h2>
+            <p>Room information is retrieved through LDAP</p>
+            <p>Availability information is retrieved through the Exchange Web Service API (SOAP)</p>
+          </section>
+          <section>
+            <h1>Server implementation</h1>
+            <p>Scala, using Netty and Unfiltered</p>
+          </section>
+          <section>
+            <img src="images/arch.png" />
+          </section>
+          <section>
+            <h2>Scala</h2>
+            <blockquote>Scala is a general purpose programming language designed to express common programming patterns in a concise, elegant, and type-safe way. It smoothly integrates features of object-oriented and functional languages, enabling Java and other programmers to be more productive. Code sizes are typically reduced by a factor of two to three when compared to an equivalent Java application</blockquote>
+            <pre><code class="scala">
+object HelloWorld {
+  def main(args: Array[String]) {
+    val who = args(1)
+    println("Hello, %s!".format(who))
+  }
+}
+            </code></pre>
+          </section>
+          <section>
+            <h2>Unfiltered</h2>
+            <blockquote>a toolkit for servicing HTTP requests in Scala. It provides a consistent vocabulary for handing requests on various server backends, without impeding direct access to their native interfaces.</blockquote>
+            <p>- <a href="http://unfiltered.databinder.net/Unfiltered.html">Unfiltered website</a></p>
+          </section>
+          <section>
+            <h2>Unfiltered (2)</h2>
+            <p>Mapping HTTP requests to Scala functions</p>
+            <pre style="font-size:14px;"><code class="scala">
+def intent = {
+  case GET(x @ Path(Seg("locations" :: Nil))) => {
+    val locations = locationRepository.allLocations
+    Accepted ~> JsonContent ~> ResponseString(Json.generate(locations, pretty=true))
+  }
+  case GET(x @ Path(Seg("locations" :: Decode.utf8(locationId) :: Nil))) => {
+    locationRepository.location(locationId) match {
+        case Some(location) => Accepted ~> JsonContent ~> 
+          ResponseString(Json.generate(location, pretty=true))
+        case None => NotFound ~> ResponseString("Could not find location with id: " + locationId)
+    }
+  }
+  case GET(x @ Path(Seg("locations" :: Decode.utf8(locationKey) :: rooms :: Nil))) => {
+    val rooms = roomRepository.roomsAtLocation(locationKey)
+    Accepted ~> JsonContent ~> ResponseString(Json.generate(rooms, pretty=true))
+  }
+}
+            </code></pre>
+          </section>
+          <section>
+            <h2>Retrieving rooms from LDAP</h2>
+            <ul>
+            <li>Rooms are found in <code>ou=Outlook Meeting Rooms,ou=Functionkeys,dc=statoil,dc=net</code></li>
+            <li>Data is unstructured, so we have to decode them.</li>
+            <li>The plan is to do this nightly.</li>
+            </ul>
+          </section>
+          <section>
+            <h2>LDAP - example</h2>
+            <pre><code class="ldap">
+cn=R.TR-RO 7.2.075 (12 pers) Video ( 52873635) in office landsca
+info=Projector, PC, interactive screen(Smartboard),
+                video conference, conference number +47 52873635
+mail=rtrro72075@statoil.com
+            </code></pre>
+            <p>is converted to</p>
+            <pre style="font-size:14px;"><code class="json ">
+{
+    "cn" : "R.TR-RO 7.2.075 (12 pers) Video ( 52873635) in office landsca",
+    "email" : "rtrro72075@statoil.com",
+    "info" : 
+      "Projector, PC, interactive screen(Smartboard), video confernce, conference number +47 52873635",
+    "id" : "rtrro72075",
+    "locationId" : "TR-RO",
+    "name" : "7.2.075",
+    "fullname" : "TR-RO 7.2.075",
+    "contactnumber" : " 52873635",
+    "capabilities" : {
+        "whiteboard" : false,
+        "projector" : true,
+        "smartboard" : true,
+        "video" : true,
+        "restricted" : false,
+        "capacity" : 12
+    }
+}
+            </code></pre>
+          </section>
+          <section>
+            <h2>Exchange - freebusy</h2>
+            <p>When is this room ready?</p>
+            <pre style="font-size:12px"><code style="height:1200px" class="xml">
+&lt;soap:Envelope xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"&gt;
+    &lt;soap:Body&gt;
+        &lt;GetUserAvailabilityRequest xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns="http://schemas.microsoft.com/exchange/services/2006/messages"&gt;
+            &lt;!-- Here, we have to specify how our timezone works regarding DST. --&gt;
+            &lt;t:TimeZone xmlns="http://schemas.microsoft.com/exchange/services/2006/types"&gt;
+                &lt;Bias&gt;-60&lt;/Bias&gt;
+                &lt;StandardTime&gt;
+                    &lt;Bias&gt;0&lt;/Bias&gt;
+                    &lt;Time&gt;03:00:00&lt;/Time&gt;
+                    &lt;DayOrder&gt;5&lt;/DayOrder&gt;
+                    &lt;Month&gt;10&lt;/Month&gt;
+                    &lt;DayOfWeek&gt;Sunday&lt;/DayOfWeek&gt;
+                &lt;/StandardTime&gt;
+                &lt;DaylightTime&gt;
+                    &lt;Bias&gt;-60&lt;/Bias&gt;
+                    &lt;Time&gt;02:00:00&lt;/Time&gt;
+                    &lt;DayOrder&gt;5&lt;/DayOrder&gt;
+                    &lt;Month&gt;3&lt;/Month&gt;
+                    &lt;DayOfWeek&gt;Sunday&lt;/DayOfWeek&gt;
+                &lt;/DaylightTime&gt;
+            &lt;/t:TimeZone&gt;
+            &lt;MailboxDataArray&gt;
+                &lt;t:MailboxData&gt;
+                    &lt;t:Email&gt;
+                        &lt;t:Address&gt;trro72075&lt;/t:Address&gt;
+                    &lt;/t:Email&gt;
+                    &lt;t:AttendeeType&gt;Required&lt;/t:AttendeeType&gt;
+                    &lt;t:ExcludeConflicts&gt;false&lt;/t:ExcludeConflicts&gt;
+                &lt;/t:MailboxData&gt;
+            &lt;/MailboxDataArray&gt;
+            &lt;t:FreeBusyViewOptions&gt;
+                &lt;t:TimeWindow&gt;
+                    &lt;t:StartTime&gt;2013-01-17T00:00:00.000+01:00&lt;/t:StartTime&gt;
+                    &lt;t:EndTime&gt;2013-01-18T00:00:00.000+01:00&lt;/t:EndTime&gt;
+                &lt;/t:TimeWindow&gt;
+                &lt;t:MergedFreeBusyIntervalInMinutes&gt;5&lt;/t:MergedFreeBusyIntervalInMinutes&gt;
+                &lt;t:RequestedView&gt;MergedOnly&lt;/t:RequestedView&gt;
+            &lt;/t:FreeBusyViewOptions&gt;
+        &lt;/GetUserAvailabilityRequest&gt;
+    &lt;/soap:Body&gt;
+&lt;/soap:Envelope&gt;
+            </code></pre>
           </section>
         </section>
-<!-- End Rest backend --> 
+  
+<!-- end Scala server -->
 
 <!-- Server story -->
         <section>
@@ -78,7 +240,25 @@
           </section>
           <section>
             <h2>2011: Azure</h2>
-          </section>  
+          </section>
+          <section>
+            <h2>Sept 2012</h2>
+            <p>Decision to abandon Azure and start developing a server internally on the new service net in Stavanger</p> 
+          </section>
+          <section>
+            <h2>Oct 2012</h2>
+            <p>Initial version of the server code completed.</p>
+            <p>Virtual server set up in regular network, ready for installation.</p>
+          </section>
+          <section>
+            <h2>Oct 2012 -> today</h2>
+            <p>Server is moved and pronounced ready several times, but still today has not been installed properly.</p>
+          </section>
+          <section>
+            <h2>Dec 2012: Heroku to the rescue</h2>
+            <p>Server deployed to Heroku cedar stack. Up and running in less than a day!!!</p>
+            <p class="fragment">Challenge: Security...</p>
+          </section>
         </section>
 <!-- End server story --> 
 
@@ -95,7 +275,6 @@
 
           </section>
           <section>
-            <h2>Example:</h2>
             <pre><code>
 navigator.geolocation.getCurrentPosition(function (pos) {
   var lat = pos.coords.latitude;
@@ -119,7 +298,8 @@ navigator.geolocation.getCurrentPosition(function (pos) {
             <p>All locations have a position (lon, lat), ex:<br>
 
             <pre><code>
-{ "key": "TR-RO", 
+{ 
+  "key": "TR-RO", 
   "country": "Norway", 
   "area": "Trondheim", 
   "location": "Rotvoll", 
@@ -130,7 +310,7 @@ navigator.geolocation.getCurrentPosition(function (pos) {
           </section>
           <section>
             <h2>To get distance</h2>
-            <pre><code>
+            <pre style="font-size:17px"><code>
 function getLocationsSortedByDistance(lon, lat) {
     var userPos = new Point(lon, lat);
     var distances = allLocations.map(function (location) {
@@ -147,7 +327,7 @@ function getLocationsSortedByDistance(lon, lat) {
           
           <section>
             <h2>Point implementation:</h2>
-            <pre><code>
+            <pre style="font-size:18px"><code>
 var Point = function(x,y){
     this.x = x;
     this.y = y;
@@ -178,7 +358,7 @@ var distVincenty = function(p1, p2) {
 
           <section>
             <h2>Setting up a map in leaflet</h2>
-            <pre><code>
+            <pre style="font-size:16px"><code>
 //create map in div with id="mapcanvas"
 var map = new L.Map('mapcanvas'); 
 var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
@@ -398,158 +578,6 @@ curl -u andrew.lunny@nitobi.com https://build.phonegap.com/api/v1/apps/2
           </section>
         </section>
 <!-- End PhoneGap --> 
-
-<!-- Scala server -->
-	<section>
-        <section>
-            <h1>Backend</h1>
-            <p>Providing the application with data</p>
-        </section>
-
-        <section>
-            <p>The data is easily retrieved using Microsoft Exchange's open source REST API.</p>
-            <img class="fragment roll-in" src="images/troll.png" />
-        </section>
-        <section>
-            <h2>No, really...</h2>
-            <p>Room information is retrieved through LDAP</p>
-            <p>Availability information is retrieved through the Exchange Web Service API (SOAP)</p>
-        </section>
-        <section>
-            <h1>Server implementation</h1>
-            <p>Scala, using Netty and Unfiltered</p>
-        </section>
-        <section>
-            <img src="images/arch.png" />
-        </section>
-        <section>
-            <h2>Scala</h2>
-            <blockquote>Scala is a general purpose programming language designed to express common programming patterns in a concise, elegant, and type-safe way. It smoothly integrates features of object-oriented and functional languages, enabling Java and other programmers to be more productive. Code sizes are typically reduced by a factor of two to three when compared to an equivalent Java application</blockquote>
-            <pre><code class="scala">
-object HelloWorld {
-    def main(args: Array[String]) {
-        val who = args(1)
-        println("Hello, %s!".format(who))
-    }
-}
-            </code></pre>
-        </section>
-        <section>
-            <h2>Unfiltered</h2>
-            <blockquote>a toolkit for servicing HTTP requests in Scala. It provides a consistent vocabulary for handing requests on various server backends, without impeding direct access to their native interfaces.</blockquote>
-            <p>- <a href="http://unfiltered.databinder.net/Unfiltered.html">Unfiltered website</a></p>
-        </section>
-        <section>
-            <h2>Unfiltered (2)</h2>
-            <p>Mapping HTTP requests to Scala functions</p>
-            <pre><code class="scala">
-def intent = {
-    case GET(x @ Path(Seg("locations" :: Nil))) => {
-        val locations = locationRepository.allLocations
-        Accepted ~> JsonContent ~> ResponseString(Json.generate(locations, pretty=true))
-    }
-    case GET(x @ Path(Seg("locations" :: Decode.utf8(locationId) :: Nil))) => {
-        locationRepository.location(locationId) match {
-            case Some(location) => Accepted ~> JsonContent ~> ResponseString(Json.generate(location, pretty=true))
-            case None => NotFound ~> ResponseString("Could not find location with id: " + locationId)
-        }
-    }
-    case GET(x @ Path(Seg("locations" :: Decode.utf8(locationKey) :: rooms :: Nil))) => {
-        val rooms = roomRepository.roomsAtLocation(locationKey)
-        Accepted ~> JsonContent ~> ResponseString(Json.generate(rooms, pretty=true))
-    }
-}
-            </code></pre>
-        </section>
-        <section>
-            <h2>Retrieving rooms from LDAP</h2>
-            <ul>
-            <li>Rooms are found in <code>ou=Outlook Meeting Rooms,ou=Functionkeys,dc=statoil,dc=net</code></li>
-            <li>Data is unstructured, so we have to decode them.</li>
-            <li>The plan is to do this nightly.</li>
-            </ul>
-        </section>
-        <section>
-            <h2>LDAP - example</h2>
-            <pre><code class="ldap">
-cn=R.TR-RO 7.2.075 (12 pers) Video ( 52873635) in office landsca
-info=Projector, PC, interactive screen(Smartboard),
-                video confernce, conference number +47 52873635
-mail=rtrro72075@statoil.com
-            </code></pre>
-            <p>is converted to</p>
-            <pre><code>
-{
-    "cn" : "R.TR-RO 7.2.075 (12 pers) Video ( 52873635) in office landsca",
-    "email" : "rtrro72075@statoil.com",
-    "info" : "Projector, PC, interactive screen(Smartboard), video confernce, conference number +47 52873635",
-    "id" : "rtrro72075",
-    "locationId" : "TR-RO",
-    "name" : "7.2.075",
-    "fullname" : "TR-RO 7.2.075",
-    "contactnumber" : " 52873635",
-    "capabilities" : {
-        "whiteboard" : false,
-        "projector" : true,
-        "smartboard" : true,
-        "video" : true,
-        "restricted" : false,
-        "capacity" : 12
-    }
-}
-            </code></pre>
-        </section>
-        <section>
-            <h2>Exchange - freebusy</h2>
-            <p>When is this room ready?</p>
-            <pre><code>
-&lt;soap:Envelope xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"&gt;
-    &lt;soap:Body&gt;
-        &lt;GetUserAvailabilityRequest xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types" xmlns="http://schemas.microsoft.com/exchange/services/2006/messages"&gt;
-            &lt;!-- Here, we have to specify how our timezone works regarding DST. --&gt;
-            &lt;t:TimeZone xmlns="http://schemas.microsoft.com/exchange/services/2006/types"&gt;
-                &lt;Bias&gt;-60&lt;/Bias&gt;
-                &lt;StandardTime&gt;
-                    &lt;Bias&gt;0&lt;/Bias&gt;
-                    &lt;Time&gt;03:00:00&lt;/Time&gt;
-                    &lt;DayOrder&gt;5&lt;/DayOrder&gt;
-                    &lt;Month&gt;10&lt;/Month&gt;
-                    &lt;DayOfWeek&gt;Sunday&lt;/DayOfWeek&gt;
-                &lt;/StandardTime&gt;
-                &lt;DaylightTime&gt;
-                    &lt;Bias&gt;-60&lt;/Bias&gt;
-                    &lt;Time&gt;02:00:00&lt;/Time&gt;
-                    &lt;DayOrder&gt;5&lt;/DayOrder&gt;
-                    &lt;Month&gt;3&lt;/Month&gt;
-                    &lt;DayOfWeek&gt;Sunday&lt;/DayOfWeek&gt;
-                &lt;/DaylightTime&gt;
-            &lt;/t:TimeZone&gt;
-            &lt;MailboxDataArray&gt;
-                &lt;t:MailboxData&gt;
-                    &lt;t:Email&gt;
-                        &lt;t:Address&gt;trro72075&lt;/t:Address&gt;
-                    &lt;/t:Email&gt;
-                    &lt;t:AttendeeType&gt;Required&lt;/t:AttendeeType&gt;
-                    &lt;t:ExcludeConflicts&gt;false&lt;/t:ExcludeConflicts&gt;
-                &lt;/t:MailboxData&gt;
-            &lt;/MailboxDataArray&gt;
-            &lt;t:FreeBusyViewOptions&gt;
-                &lt;t:TimeWindow&gt;
-                    &lt;t:StartTime&gt;2013-01-17T00:00:00.000+01:00&lt;/t:StartTime&gt;
-                    &lt;t:EndTime&gt;2013-01-18T00:00:00.000+01:00&lt;/t:EndTime&gt;
-                &lt;/t:TimeWindow&gt;
-                &lt;t:MergedFreeBusyIntervalInMinutes&gt;5&lt;/t:MergedFreeBusyIntervalInMinutes&gt;
-                &lt;t:RequestedView&gt;MergedOnly&lt;/t:RequestedView&gt;
-            &lt;/t:FreeBusyViewOptions&gt;
-        &lt;/GetUserAvailabilityRequest&gt;
-    &lt;/soap:Body&gt;
-&lt;/soap:Envelope&gt;
-            </code></pre>
-        </section>
-
-	</section>
-	
-<!-- end Scala server -->
 
 <!-- Android native start -->
         <section>
