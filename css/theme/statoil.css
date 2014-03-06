@@ -99,8 +99,8 @@ body {
 }
 
 .reveal section img.logo {
-  position: relative;
-  top:-200px;
+  position: absolute;
+  top: -300px;
   right:-250px;
   float: right;
   width: 100px;
@@ -166,4 +166,46 @@ body {
   -ms-transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
   -o-transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
   transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
+}
+
+.reveal .highlight {
+  color: #ff26a4;
+  text-shadow: 0 0 15px #ff26a4, 0 0 2px #fff; 
+}
+
+.reveal .cycler{
+  position: relative;
+  height: 600px;
+}
+
+.reveal .cycler img{
+  margin: auto auto;
+  visibility: hidden;
+  z-index:1;
+}
+.reveal .cycler img.active{
+  visibility: visible;
+  z-index:3;
+}
+
+@font-face {
+  font-family: Statoil-Display;
+  src: url("../lib/font/Statoil-DisplayMedium.otf") format("opentype");
+}
+
+@font-face {
+  font-family: Statoil-Display;
+  font-weight: bold;
+  src: url("../lib/font/Statoil-DisplayBold.otf") format("opentype");
+}
+
+@font-face {
+  font-family: Statoil-Sans;
+  src: url("../lib/font/Statoil-SansMedium.otf") format("opentype");
+}
+
+@font-face {
+  font-family: Statoil-Sans;
+  font-weight: bold;
+  src: url("../lib/font/Statoil-SansBold.otf") format("opentype");
 }
