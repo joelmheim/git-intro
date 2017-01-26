@@ -19,4 +19,5 @@ An introduction to git.
 - [Git getting started - Book](https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control): Git's own introduction to version control.
 - [GitHub .gitignore templates](https://github.com/github/gitignore): Useful collection of .gitignore templates.
 - [Git introduction course](https://katacoda.com/courses/git): Introduction to Git on katacode.com. Interactive course.
+- [Git mergetool](https://gist.github.com/karenyyng/f19ff75c60f18b4b8149): How to use 'git mergetool' to resolve conflicts.
 - [Coding in the Name of](https://www.youtube.com/watch?v=50Qs4gVHB_E&feature=youtu.be): Cool RageAgainstTheMachine parody song only slightly related to GIT (By SUSE linux)...
