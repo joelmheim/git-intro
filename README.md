@@ -18,4 +18,4 @@ An introduction to git.
 - [The simple guide to git](http://rogerdudler.github.io/git-guide/): Introduction to the basic concepts in git.
 - [Git getting started - Book](https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control): Git's own introduction to version control.
 - [GitHub .gitignore templates](https://github.com/github/gitignore): Useful collection of .gitignore templates.
-
+- [Git introduction course](https://katacoda.com/courses/git): Introduction to Git on katacode.com. Interactive course.
