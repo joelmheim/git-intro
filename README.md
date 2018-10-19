@@ -5,8 +5,8 @@ An introduction to git.
 [Script](script.md)
 
 ## Resources
-- [Git.statoil.no](http://git.statoil.no): Internal git central repository.
-- [Github.com](http://github.com): External git central repository.
+- [Git.equinor.com](https://git.equinor.com): Internal git central repository.
+- [Github.com](https://github.com): External git central repository.
 - [Git cheat sheet](http://rogerdudler.github.io/git-guide/files/git_cheat_sheet.pdf): Have all the most common commands at a glance.
 - [Git cheat sheet](http://ndpsoftware.com/git-cheatsheet.html): Interactive git cheat sheet. Commands in context.
 - Installing git:
